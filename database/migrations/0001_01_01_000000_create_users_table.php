@@ -15,10 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('phone')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['user', 'court_admin', 'super_admin'])->default('user');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+
+            // Add indexes for performance
+            $table->index('role');
+            $table->index(['latitude', 'longitude']);
+            $table->index('email');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

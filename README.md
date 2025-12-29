@@ -1,59 +1,238 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PadelGo Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A production-ready REST API backend for **PadelGo**, a dedicated padel ecosystem mobile application.
 
-## About Laravel
+## 🎯 Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PadelGo is an API-only backend built with Laravel and PostgreSQL, designed to power a Flutter mobile application for discovering padel courts, creating matches, and managing real-time scoring.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Key Features:**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- ✅ Token-based authentication (Sanctum)
+- ✅ Court discovery & location-based search
+- ✅ Match creation & player management
+- ✅ Built-in scoring system (sets/games/points)
+- ✅ Role-based access control (user, court_admin, super_admin)
+- ✅ RESTful API with comprehensive validation
+- ✅ Database seeding for development
+- ✅ Production-ready architecture
 
-## Learning Laravel
+## 🛠 Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Framework**: Laravel 11 (latest stable)
+- **Database**: PostgreSQL
+- **Authentication**: Laravel Sanctum (Token-based)
+- **API**: RESTful, versioned (v1)
+- **Language**: PHP 8.2+
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📦 Quick Start
 
-## Laravel Sponsors
+```bash
+# Clone & setup
+git clone <repository-url> padelgo-backend && cd padelgo-backend
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Configure environment
+cp .env.example .env
+php artisan key:generate
 
-### Premium Partners
+# Setup database
+createdb padelgo
+php artisan migrate --seed
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Start server
+php artisan serve
+```
 
-## Contributing
+**API available at**: `http://localhost:8000/api/v1`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📚 Documentation
 
-## Code of Conduct
+- **[API Documentation](./API_DOCUMENTATION.md)** - Complete endpoint reference
+- **[Setup Checklist](./SETUP_CHECKLIST.md)** - Full setup & deployment guide
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🔐 Authentication
 
-## Security Vulnerabilities
+Token-based using Laravel Sanctum. Include in all authenticated requests:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+Authorization: Bearer <token>
+```
 
-## License
+## 🎮 API Routes
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Category    | Method     | Endpoint                                            | Auth        |
+| ----------- | ---------- | --------------------------------------------------- | ----------- |
+| **Auth**    | POST       | `/auth/register`                                    | ✗           |
+|             | POST       | `/auth/login`                                       | ✗           |
+|             | POST       | `/auth/logout`                                      | ✓           |
+|             | GET        | `/auth/me`                                          | ✓           |
+| **Courts**  | GET        | `/courts`                                           | ✓           |
+|             | GET        | `/courts/nearby`                                    | ✓           |
+|             | POST       | `/courts`                                           | ✓ (admin)   |
+|             | PUT/DELETE | `/courts/{id}`                                      | ✓ (admin)   |
+| **Matches** | GET        | `/matches`                                          | ✓           |
+|             | GET        | `/matches/nearby`                                   | ✓           |
+|             | POST       | `/matches`                                          | ✓           |
+|             | PUT/DELETE | `/matches/{id}`                                     | ✓ (creator) |
+|             | POST       | `/matches/{id}/join`                                | ✓           |
+|             | POST       | `/matches/{id}/leave`                               | ✓           |
+| **Scoring** | GET        | `/matches/{id}/scoring`                             | ✓           |
+|             | POST       | `/matches/{id}/scoring/sets`                        | ✓ (creator) |
+|             | POST/PUT   | `/matches/{id}/scoring/sets/{setId}/games/{gameId}` | ✓ (creator) |
+
+## 📁 Project Structure
+
+```
+app/
+├── Enums/                    # UserRole, MatchStatus, SkillLevel, MatchType
+├── Http/Controllers/Api/V1/  # AuthController, CourtController, MatchController, ScoringController
+├── Http/Middleware/          # CheckRole, HandleApiExceptions
+├── Http/Requests/            # Form request validation
+├── Models/                    # User, Partner, Court, PadelMatch, MatchPlayer, Set, Game
+├── Services/                 # AuthService
+└── Traits/                    # ApiResponse
+
+database/
+├── migrations/               # Database schema
+├── factories/               # Model factories
+└── seeders/                 # Database seeders
+```
+
+## 💾 Database Models
+
+- **Users**: With Sanctum tokens, roles, location
+- **Partners**: Court organizations
+- **Courts**: Padel courts with location indexes
+- **PadelMatches**: Matches with status tracking
+- **MatchPlayers**: M2M relationship with teams
+- **Sets** & **Games**: Match scoring structure
+
+## 🔒 User Roles
+
+- `user`: Regular player (default)
+- `court_admin`: Manage assigned courts
+- `super_admin`: Full system access
+
+## 🌍 Key Features
+
+### Court Discovery
+
+- List all courts with pagination
+- Search by city
+- Location-based nearby search (lat/long + radius)
+- Automatic distance calculation
+
+### Match Management
+
+- Create open matches at courts
+- Join/leave matches (with validation)
+- Track current vs max players
+- Prevent double-joining
+- Filter by skill level, match type, status
+
+### Scoring System
+
+- Create sets for matches
+- Create games within sets
+- Update game scores (team_a_points, team_b_points)
+- Mark sets/games as completed
+- Finish matches with full score history
+
+### Authentication
+
+- Register with email & password
+- Login with token generation
+- Secure logout (revoke tokens)
+- Get current user profile
+- Location tracking
+
+## 🚀 Deployment
+
+See [SETUP_CHECKLIST.md](./SETUP_CHECKLIST.md) for complete deployment guide including:
+
+- VPS setup (Hostinger, DigitalOcean, etc.)
+- Nginx configuration
+- SSL/HTTPS setup
+- Database backup strategy
+- Monitoring & logging
+
+## 🧪 Development
+
+```bash
+# Run migrations
+php artisan migrate
+
+# Seed database
+php artisan db:seed
+
+# Start development server
+php artisan serve
+
+# Run tests
+php artisan test
+```
+
+## 📝 API Response Format
+
+All responses are JSON with consistent format:
+
+**Success:**
+
+```json
+{
+  "success": true,
+  "message": "Success message",
+  "data": { ... }
+}
+```
+
+**Error:**
+
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "errors": { "field": ["Error detail"] }
+}
+```
+
+**Paginated:**
+
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": [ ... ],
+  "pagination": { "total": 100, "per_page": 15, ... }
+}
+```
+
+## ⚙️ Environment Setup
+
+Key variables in `.env`:
+
+```env
+APP_NAME=PadelGo
+APP_ENV=local
+DB_CONNECTION=pgsql
+DB_HOST=localhost
+DB_DATABASE=padelgo
+DB_USERNAME=postgres
+
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1
+```
+
+## 📞 Support & Issues
+
+- Check [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) for detailed endpoint docs
+- Review [SETUP_CHECKLIST.md](./SETUP_CHECKLIST.md) for setup issues
+- See [Laravel Docs](https://laravel.com/docs) for framework questions
+
+## 📄 License
+
+Proprietary - PadelGo
+
+---
+
+**Built for the Padel Community** ⭐
