@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\UnauthorizedException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -23,31 +24,23 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        try {
-            $user = $this->authService->register($request->validated());
-            $token = $this->authService->createToken($user);
+        $user = $this->authService->register($request->validated());
+        $token = $this->authService->createToken($user);
 
-            return $this->success(
-                [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'phone' => $user->phone,
-                        'role' => $user->role,
-                    ],
-                    'token' => $token,
+        return $this->success(
+            [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'role' => $user->role,
                 ],
-                'User registered successfully',
-                201
-            );
-        } catch (\Exception $e) {
-            return $this->error(
-                'Registration failed: ' . $e->getMessage(),
-                [],
-                400
-            );
-        }
+                'token' => $token,
+            ],
+            'User registered successfully',
+            201
+        );
     }
 
     /**
@@ -61,11 +54,7 @@ class AuthController extends Controller
         );
 
         if (!$user) {
-            return $this->error(
-                'Invalid email or password',
-                [],
-                401
-            );
+            throw new UnauthorizedException('Invalid email or password');
         }
 
         $token = $this->authService->createToken($user);
