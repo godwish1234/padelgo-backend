@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\V1\ScoringController;
  * All routes are prefixed with /api/v1
  */
 
-Route::prefix('api/v1')->group(function () {
+Route::prefix('v1')->group(function () {
     /**
      * Public Auth Routes
      */
@@ -64,7 +64,7 @@ Route::prefix('api/v1')->group(function () {
 /**
  * Health check endpoint (no auth required)
  */
-Route::get('/api/health', function () {
+Route::get('/health', function () {
     return response()->json([
         'status' => 'healthy',
         'timestamp' => now(),
