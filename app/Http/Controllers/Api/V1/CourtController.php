@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Exceptions\ResourceNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCourtRequest;
 use App\Http\Requests\UpdateCourtRequest;
+use App\Http\Resources\CourtResource;
+use App\Http\Resources\CourtScheduleResource;
 use App\Models\Court;
+use App\Services\CourtService;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 /**
  * Court Controller
@@ -15,6 +20,8 @@ use App\Traits\ApiResponse;
 class CourtController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(private ?CourtService $courtService = null) {}
 
     /**
      * Get all courts with pagination and filtering
@@ -152,4 +159,33 @@ class CourtController extends Controller
             'Nearby courts retrieved successfully'
         );
     }
+
+    /**
+     * Get schedules for a specific court
+     */
+    public function schedules($id, Request $request)
+    {
+        if (!$this->courtService) {
+            $this->courtService = app(CourtService::class);
+        }
+
+        $perPage = $request->query('per_page', 20);
+        $schedules = $this->courtService->getSchedulesByCourt($id, $perPage);
+
+        if ($schedules->isEmpty() && $schedules->currentPage() === 1) {
+            // Check if court exists
+            $court = $this->courtService->getCourtById($id);
+            if (!$court) {
+                throw new ResourceNotFoundException('Court not found');
+            }
+        }
+
+        return $this->paginated(
+            $schedules->setCollection(
+                $schedules->getCollection()->map(fn($schedule) => new CourtScheduleResource($schedule))
+            ),
+            'Court schedules retrieved successfully'
+        );
+    }
 }
+

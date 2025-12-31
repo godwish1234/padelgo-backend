@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourtController;
 use App\Http\Controllers\Api\V1\MatchController;
 use App\Http\Controllers\Api\V1\NewsController;
+use App\Http\Controllers\Api\V1\PartnerController;
+use App\Http\Controllers\Api\V1\PartnerLocationController;
 use App\Http\Controllers\Api\V1\ScoringController;
 
 /**
@@ -27,6 +29,24 @@ Route::prefix('v1')->group(function () {
         Route::get('/tags', [NewsController::class, 'tags']);
         Route::get('/{id}', [NewsController::class, 'show']);
     });
+
+    /**
+     * Public Partner & Location Routes
+     */
+    Route::prefix('partners')->group(function () {
+        Route::get('/', [PartnerController::class, 'index']);
+        Route::get('/{id}', [PartnerController::class, 'show']);
+    });
+
+    Route::prefix('partner-locations')->group(function () {
+        Route::get('/', [PartnerLocationController::class, 'index']);
+        Route::get('/search', [PartnerLocationController::class, 'search']);
+        Route::get('/nearest', [PartnerLocationController::class, 'nearest']);
+        Route::get('/{id}', [PartnerLocationController::class, 'show']);
+        Route::get('/{id}/courts', [PartnerLocationController::class, 'courts']);
+    });
+
+    Route::get('/courts/{id}/schedules', [CourtController::class, 'schedules']);
 
     /**
      * Protected Routes (require authentication)
