@@ -16,6 +16,7 @@ class Court extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'partner_location_id',
         'partner_id',
         'admin_user_id',
         'name',
@@ -43,6 +44,14 @@ class Court extends Model
     }
 
     /**
+     * Get the partner location that owns this court
+     */
+    public function partnerLocation(): BelongsTo
+    {
+        return $this->belongsTo(PartnerLocation::class);
+    }
+
+    /**
      * Get the partner that owns this court
      */
     public function partner(): BelongsTo
@@ -59,10 +68,34 @@ class Court extends Model
     }
 
     /**
+     * Get all schedules for this court
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(CourtSchedule::class);
+    }
+
+    /**
+     * Get only active schedules
+     */
+    public function activeSchedules(): HasMany
+    {
+        return $this->hasMany(CourtSchedule::class)->where('is_active', true);
+    }
+
+    /**
      * Get all matches at this court
      */
     public function matches(): HasMany
     {
         return $this->hasMany(PadelMatch::class);
+    }
+
+    /**
+     * Scope to get only active courts
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }
