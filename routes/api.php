@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourtController;
 use App\Http\Controllers\Api\V1\MatchController;
+use App\Http\Controllers\Api\V1\NewsController;
 use App\Http\Controllers\Api\V1\ScoringController;
 
 /**
@@ -17,6 +18,15 @@ Route::prefix('v1')->group(function () {
      */
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+
+    /**
+     * Public News Routes
+     */
+    Route::prefix('news')->group(function () {
+        Route::get('/', [NewsController::class, 'index']);
+        Route::get('/tags', [NewsController::class, 'tags']);
+        Route::get('/{id}', [NewsController::class, 'show']);
+    });
 
     /**
      * Protected Routes (require authentication)
